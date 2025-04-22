@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Service untuk backend Flask
+  backend:
+    build:
+      context: ./BE  # Lokasi Dockerfile untuk backend
+    container_name: weather-backend
+    ports:
+      - "5000:5000"  # Mapped ke port 5000 lokal
+    environment:
+      - DATABASE_URL=postgresql://Mikoto:0@db:5432/weather_db  # Koneksi ke database
+    depends_on:
+      - db  # Menunggu database untuk siap
+    networks:
+      - weather-network
+
+  # Service untuk PostgreSQL
+  db:
+    image: postgres:13  # Gunakan image resmi PostgreSQL
+    container_name: weather-db
+    environment:
+      - POSTGRES_USER=Mikoto
+      - POSTGRES_PASSWORD=0
+      - POSTGRES_DB=weather_db
+    ports:
+      - "5432:5432"  # Mapped ke port 5432 lokal
+    volumes:
+      - weather-db-data:/var/lib/postgresql/data  # Persisten data DB
+    networks:
+      - weather-network
+
+# Network agar service bisa saling berkomunikasi
+networks:
+  weather-network:
+    driver: bridge
+
+# Volume untuk menyimpan data PostgreSQL
+volumes:
+  weather-db-data:
+    driver: local
