@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  # Service untuk frontend (React)
+  frontend:
+    build:
+      context: ./FE  # Lokasi Dockerfile untuk frontend
+    container_name: weather-frontend
+    ports:
+      - "80:80"  # Mapped ke port 80 lokal
+    depends_on:
+      - backend  # Menunggu backend untuk siap
+    networks:
+      - weather-network
+
   # Service untuk backend Flask
   backend:
     build:

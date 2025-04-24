@@ -1,20 +1,62 @@
-# Cloud Weather Tracker
+# 🌤️ Cloud Weather Tracker
 
-Aplikasi untuk memantau cuaca terkini berdasarkan lokasi pengguna. Dibangun dengan **Flask** di backend, **React** di frontend, dan menggunakan **PostgreSQL** untuk database. Aplikasi ini juga menggunakan **Docker** untuk containerization.
+**Cloud Weather Tracker** adalah aplikasi web interaktif untuk memantau cuaca dan kualitas udara terkini berdasarkan lokasi pengguna. Aplikasi ini dibangun dengan arsitektur modern menggunakan **React** di frontend, **Flask** di backend, dan **PostgreSQL** sebagai database. Aplikasi ini dikemas menggunakan **Docker** untuk kemudahan deployment dan manajemen layanan.
 
-## Teknologi
+---
 
-- **Frontend**: React
+## 🚀 Teknologi yang Digunakan
+
+- **Frontend**: React + Tailwind CSS + Vite
 - **Backend**: Flask (Python)
 - **Database**: PostgreSQL
+- **Visualisasi**: Recharts (untuk grafik kualitas udara)
 - **Containerization**: Docker, Docker Compose
+- **API**: OpenWeatherMap API (cuaca dan kualitas udara)
 
-## Fitur
+---
 
-- Memasukkan lokasi untuk mendapatkan data cuaca terkini.
-- Menampilkan suhu, kelembaban, dan kecepatan angin.
-- Menyimpan data cuaca di PostgreSQL untuk analisis lebih lanjut.
+## 🎯 Fitur Utama
 
-## Lisensi
+- ✅ Input lokasi untuk mendapatkan data cuaca terkini
+- 🌡️ Menampilkan suhu, kelembaban, dan deskripsi cuaca
+- 🏭 Menampilkan komponen kualitas udara seperti PM2.5, PM10, CO, NO2, O3, dan SO2
+- 📊 Menampilkan grafik kualitas udara dengan visualisasi bar chart
+- 🕒 Menyimpan riwayat pencarian cuaca ke database PostgreSQL
+- 🧹 Fitur penghapusan riwayat secara individual maupun sekaligus
+- 🌗 Tampilan UI dinamis berdasarkan waktu (siang/malam) dan kondisi cuaca
+- 🐳 Multi-container environment menggunakan Docker Compose
 
-Proyek ini dikerjakan oleh kelompok **1** kelas **Cloud Computing** 
+---
+
+## ⚙️ Cara Menjalankan Aplikasi
+### 1. Jalankan dengan Docker Compose
+Pastikan Docker dan Docker Compose sudah terinstal.
+
+```bash
+docker-compose up --build
+```
+- Frontend React akan berjalan di http://localhost
+
+- Backend Flask diakses di http://localhost:5000
+
+- PostgreSQL berjalan di port 5432
+
+### 2. Struktur Endpoint Backend
+- GET /weather?city=... → Mengambil data cuaca berdasarkan kota
+
+- GET /air-quality?lat=...&lon=... → Mengambil data kualitas udara berdasarkan koordinat
+
+- GET /history → Menampilkan riwayat pencarian
+
+- POST /search → Menyimpan data pencarian
+
+- DELETE /history/:id → Menghapus satu riwayat
+
+- DELETE /history → Menghapus seluruh riwayat
+
+# 📜 Lisensi
+Proyek ini dikembangkan oleh Kelompok 1 - Cloud Computing Class sebagai bagian dari tugas pengembangan aplikasi berbasis cloud modern.
+
+
+
+

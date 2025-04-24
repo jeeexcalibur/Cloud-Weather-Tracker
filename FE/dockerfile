@@ -1,0 +1,22 @@
+# Step 1: Build the React app
+FROM node:18 AS build
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json (or yarn.lock) and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Build untuk production menggunakan Vite
+RUN npm run build
+
+# Gunakan Nginx untuk serve static file
+FROM nginx:stable-alpine
+COPY --from=0 /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
