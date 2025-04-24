@@ -9,3 +9,5 @@ class WeatherData(db.Model):
     humidity = db.Column(db.Integer)
     description = db.Column(db.String(120))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+
