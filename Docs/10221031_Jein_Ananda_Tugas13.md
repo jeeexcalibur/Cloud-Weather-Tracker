@@ -1,164 +1,158 @@
 # 🌦️ Cloud Weather Tracker
-## Pekan 12: Integrasi dan Docker Compose
+## Pekan 13: CI/CD Setup dan Cloud Deployment
+
+## Link 
+Backend : https://cloud-weather-tracker-production.up.railway.app/ 
+
+Backend for test API : https://cloud-weather-tracker-production.up.railway.app/api
+
+Frontend : https://cloud-weather-tracker.vercel.app/
 
 ## Checkpoint 
-1. Integrasi antar layanan backend
-2. Mengatur komunikasi antar microservices
-3. Membuat file Docker Compose untuk menjalankan semua layanan
-4. Implementasi volume untuk persistensi data
+1. Setup GitHub Actions untuk CI/CD pipeline dasar
+2. Deploy aplikasi ke platform cloud (pilih salah satu: AWS, Google Cloud, Azure, atau layanan alternatif seperti DigitalOcean, Heroku)
+3. Konfigurasi environment variables dan secrets
 
 ## Jawaban Checkpoint
 
-### 1. Integrasi antar layanan backend
-Integrasi dilakukan antara backend Flask dengan database PostgreSQL menggunakan SQLAlchemy. Backend membaca dan menyimpan data cuaca serta kualitas udara ke dalam database melalui koneksi DATABASE_URL yang didefinisikan di Docker Compose
-```yaml
-environment:
-  - DATABASE_URL=postgresql://Mikoto:0@db:5432/weather_db
+# 1 + 2 + 3 . Setup GitHub Actions untuk CI/CD pipeline dasar dan deploy aplikasi ke platform cloud dan setting variable
+
+Untuk menjawab point nomor 1,2 dan 3, saya menggunakan dua platform Cloud yang berbeda, untuk Backend saya menggunakan Railways dan untuk frontend saya menggunakan Vercel, untuk penjelasan dimulai dari backend
+
+# Backend Deployment
+## 1. Langkah Pertama
+Dalam backend diperlukan file baru yaitu Procfile dengan isi 
 ```
-lalu 
+web: gunicorn app:app
+```
+digunakan untuk menjalankan aplikasi menggunakan gunicorn
 
-1. Frontend mengirim permintaan ke /api/weather di backend.
-2. Backend mengambil data dari OpenWeather API → menyimpan ke database.
-3. Backend juga mengambil data historis dari database untuk ditampilkan kembali ke frontend.
-![alt text](Images/12_1.png)
-
-pada gambar menunjukan Frontend melakukan Request ke backend dengan request kota Balikpapan, dan layanan backend mengembalikan data cuaca dan kualitas udara dari OpenWeather API dan menyimpannya ke database.
-![alt text](Images/12_2.png)
-
-### 2. Mengatur komunikasi antar microservices
-Docker Compose digunakan untuk mengatur jaringan antar service: frontend, backend, dan db. Semua service berada dalam satu network bernama weather-network, memungkinkan backend berkomunikasi dengan database, dan frontend mengakses API backend.
-```yaml
-# Network agar service bisa saling berkomunikasi
-networks:
-  weather-network:
-    driver: bridge
-
+lalu Dalam backend diperlukan update file baru yaitu requirements.txt dengan isi 
+```
+Flask
+flask-cors
+flask-sqlalchemy
+requests
+psycopg2-binary
+python-dotenv
+gunicorn
 ```
 
-### 3. Membuat file Docker Compose untuk menjalankan semua layanan
-```yaml
-version: '3.8'
+## 2. Langkah Kedua
+Dalam backend diperlukan update file di app.py 
 
-services:
-  # Service untuk frontend (React)
-  frontend:
-    build:
-      context: ./FE  # Lokasi Dockerfile untuk frontend
-    container_name: weather-frontend
-    ports:
-      - "80:80"  # Mapped ke port 80 lokal
-    depends_on:
-      - backend  # Menunggu backend untuk siap
-    networks:
-      - weather-network
-
-  # Service untuk backend Flask
-  backend:
-    build:
-      context: ./BE  # Lokasi Dockerfile untuk backend
-    container_name: weather-backend
-    ports:
-      - "5000:5000"  # Mapped ke port 5000 lokal
-    environment:
-      - DATABASE_URL=postgresql://Mikoto:0@db:5432/weather_db  # Koneksi ke database
-    depends_on:
-      - db  # Menunggu database untuk siap
-    networks:
-      - weather-network
-
-  # Service untuk PostgreSQL
-  db:
-    image: postgres:13  # Gunakan image resmi PostgreSQL
-    container_name: weather-db
-    environment:
-      - POSTGRES_USER=Mikoto
-      - POSTGRES_PASSWORD=0
-      - POSTGRES_DB=weather_db
-    ports:
-      - "5432:5432"  # Mapped ke port 5432 lokal
-    volumes:
-      - weather-db-data:/var/lib/postgresql/data  # Persisten data DB
-    networks:
-      - weather-network
-
-# Network agar service bisa saling berkomunikasi
-networks:
-  weather-network:
-    driver: bridge
-
-# Volume untuk menyimpan data PostgreSQL
-volumes:
-  weather-db-data:
-    driver: local
-```
-File docker-compose.yml ini menggunakan versi 3.8 dan mendefinisikan tiga service utama: frontend, backend, dan db (PostgreSQL). Masing-masing service berjalan dalam container terpisah dan diatur dalam satu network bernama weather-network agar dapat saling berkomunikasi secara internal.
-
-Service frontend dibangun dari folder ./FE menggunakan Dockerfile React dan menghasilkan container bernama weather-frontend. Service ini akan dijalankan pada port 80 yang di-map ke port 80 lokal, sehingga aplikasi dapat diakses melalui browser tanpa perlu menyebutkan port secara eksplisit. Service ini memiliki depends_on terhadap backend, memastikan backend siap terlebih dahulu sebelum frontend dijalankan.
-
-Service backend menggunakan Flask dan dibangun dari folder ./BE. Container weather-backend dijalankan pada port 5000 dan memiliki variabel lingkungan DATABASE_URL untuk menghubungkan ke service database. Nilai variabel ini menunjuk ke service db pada port default PostgreSQL (5432) dengan user, password, dan nama database yang telah ditentukan. Backend juga menunggu database siap sebelum berjalan menggunakan depends_on.
-
-Service db menggunakan image resmi postgres:13 untuk menyediakan database PostgreSQL. Konfigurasinya meliputi POSTGRES_USER, POSTGRES_PASSWORD, dan POSTGRES_DB, dengan penyimpanan data bersifat persisten melalui volume bernama weather-db-data, yang dipetakan ke direktori /var/lib/postgresql/data di dalam container. Dengan ini, data tidak akan hilang meskipun container di-rebuild.
-
-Semua service berada dalam satu jaringan bridge bernama weather-network, memungkinkan koneksi internal antar-container menggunakan nama servicenya masing-masing. Selain itu, volume weather-db-data didefinisikan agar container database memiliki penyimpanan yang tahan terhadap restart atau rebuild, menjaga konsistensi data dalam pengembangan maupun produksi.
-
-
-Dokukentasi Container Docker : 
-![alt text](Images/12_3.png)
-
-Ada tiga container yang sedang berjalan di bawah satu stack/project bernama cloudweathertracker:
-
-1. weather-frontend
-
-    Container ID: 4d1470d42de9
-
-    Nama container penuh: cloudweathertracker-frontend
-
-    Port yang terbuka: 80:80, artinya layanan frontend (React + Nginx) bisa diakses lewat browser di http://localhost.
-
-    Status: Aktif (ditandai dengan titik hijau)
-
-  
-
-2. weather-backend
-
-    Container ID: 69df3116987a
-
-    Nama container penuh: cloudweathertracker-backend
-
-    Port yang terbuka: 5000:5000, artinya API Flask dapat diakses melalui http://localhost:5000.
-
-    Status: Aktif
-
-  
-
-3. weather-db
-
-    Container ID: 532686c696a5
-
-    Image yang digunakan: postgres:13
-
-    Port yang terbuka: 5432:5432, yaitu port default PostgreSQL yang bisa diakses dari tools seperti pgAdmin, DBeaver, atau aplikasi backend.
-
-    Status: Aktif
-
-   
-
-
-
-### 4. Implementasi volume untuk persistensi data
-Volume bernama weather-db-data digunakan untuk menyimpan data PostgreSQL secara permanen di luar container.
-```yaml
-volumes:
-  weather-db-data:
-    driver: local
-    ```
+`app.py`
+```python
+@app.route("/init-db")
+def init_db():
+    try:
+        db.create_all()
+        return "✅ Database tables created successfully!"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 ```
 
-# Contributions 
-1. Jein Ananda - Fullstack Developer week 9 - 12
-2. Muhammad Aulia Rahman - Tidak aktif 9 - 12
-3. Dicky Ramadhoni Oktagian - Tidak Aktif 9 - 12
+pertama membuat fungsi baru dalam app.py dengan nama init-db, dengan tujuan Agar dapat menginisialisasi tabel database PostgreSQL secara manual dari browser atau Postman, terutama setelah deploy pertama kali. 
 
-# Link Video
+`config.py`
+```python
+class Config:
+    API_KEY = os.getenv("API_KEY")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+```
 
-https://drive.google.com/drive/folders/1n9boZEL_QaWRlOV66AmZY9isY5Hi5JOK?usp=sharing
+perubahan ini dilakukan Agar Flask dapat membaca variable API_KEY dan DATABASE_URL yang dikonfigurasi di Railway Environment Variables. Tanpa ini, backend akan gagal fetch data dari OpenWeatherMap.
+
+## 3. Langkah Ketiga
+Setelah melakukan beberapa perubahan pada file backend selanjutnya melakukan Deployment pada Railway, dimana membuat project baru pada railway dengan nama Cloud-Weather-Tracker, lalu masuk ke pengaturan
+
+### 1. Source Repository
+![alt text](Images/13_1.png)
+
+CI/CD (Continuous Integration and Continuous Deployment) dalam proyek ini berjalan secara otomatis melalui integrasi antara Railway dan GitHub.
+
+Setiap kali saya melakukan push atau update ke branch utama (main) pada repository bernama Cloud-Weather-Tracker, Railway secara otomatis akan:
+  1. Menarik perubahan terbaru dari repository
+  2. Membangun ulang environment backend
+  3. Menjalankan proses deployment menggunakan konfigurasi yang telah disediakan
+  4. Mengupdate aplikasi secara langsung ke URL live tanpa perlu proses manual
+
+Proyek ini menggunakan struktur direktori dengan folder BE/ (backend) sebagai root deployment. Branch default yang digunakan adalah main, sesuai dengan standar pengembangan di repository ini.
+
+### 2. Region Set
+![alt text](Images/13_2.png)
+Untuk koneksi server yang maksimal dikarenkan kita berada di Indonesia lokasi server yang paling dekat adalah Singapore, karena itu saya menggunakan server singapore pada backend nya
+
+### 3.Network for Domain
+![alt text](Images/13_3.png)
+Untuk Network saya menggunakan generate domain default dari railway yang mana tergenerasi secara otomatis oleh railway yaitu 
+https://cloud-weather-tracker-production.up.railway.app/
+
+### 4. Variable Set
+![alt text](image.png).png)
+Dalam aplikasi ini, dua variabel yang digunakan untuk memastikan aplikasi berjalan dengan baik di Railway adalah: 
+1. API_KEY
+Variabel ini berisi kunci API dari OpenWeatherMap yang digunakan untuk mengambil data cuaca dan kualitas udara dari API tersebut. API_KEY ini sangat penting karena tanpa kunci yang valid, aplikasi tidak akan dapat mengakses data cuaca dan kualitas udara yang dibutuhkan. Kunci API ini disimpan di environment variables Railway untuk menjaga keamanannya.
+
+Penggunaan:
+api_key = Config.API_KEY
+
+2. DATABASE_URL
+Variabel ini berisi URL koneksi ke database PostgreSQL yang digunakan oleh aplikasi untuk menyimpan data cuaca dan kualitas udara yang diterima. Variabel ini juga disimpan di environment variables Railway untuk mengonfigurasi database yang digunakan aplikasi, agar bisa diakses secara aman dan terhubung dengan baik saat aplikasi berjalan di server Railway.
+
+Penggunaan:
+SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+
+### 5. Deployment
+Untuk melakukan deployment saya menggunakan tombol deploy yang ada di bagian kanan atas pada halaman dashboard
+
+![alt text](Images/13_6.png)
+
+### 6. Database Setup
+untuk database melakukan setup untuk postgree, pertama tama copy connection url untuk variables database yang akan digunakan di backend 
+![alt text](Images/13_7.png)
+
+lalu jalankan fungsi init-db pada app.py
+```python
+@app.route("/init-db")
+def init_db():
+    try:
+        db.create_all()
+        return "✅ Database tables created successfully!"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+```
+![alt text](Images/13_8.png)
+
+Table akan otomatis terbuat berkat models yang telah dibuat sebelumnya
+![alt text](Images/13_9.png)
+
+
+# Frontend
+
+## 1. Langkah Pertama
+
+Melakukan setup project baru di vercel, dan masuk ke pengaturan
+dimana source CI/CD menggunakan repository Cloud-Weather-Tracker sama halnya dengan backend sebelumnya akan terus otomatis terupdate setiap saya melakukan push atau update ke repository Cloud-Weather-Tracker, untuk root berbeda dengan BACKEND dikarenakan vercel saya fokuskan untuk Frontend jadi saya menggunakan folder FE/ (frontend) sebagai root deployment. , sesuai dengan standar pengembangan di repository ini.
+![alt text](Images/13_10.png)
+
+Tampilan jika berhasil deploy
+![alt text](Images/13_11.png)
+
+# Testing 
+
+### Landing Page
+![alt text](Images/13_12.png)
+
+### Search 
+![alt text](Images/13_13.png)
+
+### History
+![alt text](Images/13_14.png)
+
+Database
+
+![alt text](Images/13_15.png)
+![alt text](Images/13_16.png)
+
