@@ -67,14 +67,12 @@ def delete_history(id):
         return jsonify({"message": "History deleted successfully"}), 200
     return jsonify({"message": "History not found"}), 404
 
-@app.route('/create-tables')
-def create_tables():
-    db.create_all()
-    return 'Tables created!', 200
-
 
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()  # Buat tabel jika belum ada
+        db.create_all()
     app.run(debug=True, host="0.0.0.0")
+else:
+    with app.app_context():
+        db.create_all()
