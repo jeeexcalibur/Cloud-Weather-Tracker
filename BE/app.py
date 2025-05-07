@@ -67,6 +67,13 @@ def delete_history(id):
         return jsonify({"message": "History deleted successfully"}), 200
     return jsonify({"message": "History not found"}), 404
 
+@app.route("/init-db")
+def init_db():
+    try:
+        db.create_all()
+        return "✅ Database tables created successfully!"
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 
 if __name__ == "__main__":
