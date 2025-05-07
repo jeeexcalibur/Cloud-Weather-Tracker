@@ -22,18 +22,38 @@ function App() {
   }, []);
 
   const fetchWeather = async () => {
+    if (!city.trim()) {
+      setError("Nama kota tidak boleh kosong.");
+      return;
+    }
+  
     setLoading(true);
     setError(null);
-
+  
     try {
-      const res = await axios.post(`${BASE_URL}/api`, { city });
+      console.log("🔍 City yang dikirim:", city); // DEBUG
+  
+      const res = await axios.post(`${BASE_URL}/api`, 
+        { city: city.trim() }, 
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+  
       setResult(res.data);
     } catch (err) {
-      setError('Gagal mengambil data. Pastikan backend sudah jalan.');
+      console.error("❌ Error dari backend:", err.response?.data);
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Gagal mengambil data dari server.");
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
