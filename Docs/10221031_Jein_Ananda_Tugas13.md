@@ -90,7 +90,7 @@ Untuk Network saya menggunakan generate domain default dari railway yang mana te
 https://cloud-weather-tracker-production.up.railway.app/
 
 ### 4. Variable Set
-![alt text](image.png).png)
+![alt text](Images/13_5.png)
 Dalam aplikasi ini, dua variabel yang digunakan untuk memastikan aplikasi berjalan dengan baik di Railway adalah: 
 1. API_KEY
 Variabel ini berisi kunci API dari OpenWeatherMap yang digunakan untuk mengambil data cuaca dan kualitas udara dari API tersebut. API_KEY ini sangat penting karena tanpa kunci yang valid, aplikasi tidak akan dapat mengakses data cuaca dan kualitas udara yang dibutuhkan. Kunci API ini disimpan di environment variables Railway untuk menjaga keamanannya.
