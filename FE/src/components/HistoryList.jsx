@@ -7,14 +7,6 @@ const HistoryList = ({ data, onDelete, onDeleteAll }) => {
     <div className="bg-white p-6 rounded-2xl shadow-lg mt-8">
       <h3 className="text-2xl font-semibold text-gray-800 mb-6">Riwayat Pencarian Cuaca</h3>
 
-      <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={onDeleteAll}
-          className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-        >
-          Hapus Semua Riwayat
-        </button>
-      </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-gray-700">
