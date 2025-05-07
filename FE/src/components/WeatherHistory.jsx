@@ -4,11 +4,12 @@ const WeatherHistory = () => {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/history/weather')
+    fetch('https://cloud-weather-tracker-production.up.railway.app/api/history/weather')
       .then((res) => res.json())
       .then((data) => setHistory(data))
       .catch((err) => console.error(err));
   }, []);
+  
 
   return (
     <div className="container mx-auto p-4">

@@ -5,6 +5,8 @@ import AirQualityCard from './components/AirQualityCard';
 import AirQualityChart from './components/AirQualityChart';
 import HistoryList from './components/HistoryList';
 
+const BASE_URL = 'https://cloud-weather-tracker-production.up.railway.app';
+
 function App() {
   const [city, setCity] = useState('');
   const [result, setResult] = useState(null);
@@ -13,7 +15,7 @@ function App() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/history/weather')
+    fetch(`${BASE_URL}/api/history/weather`)
       .then((res) => res.json())
       .then((data) => setHistory(data))
       .catch((err) => console.error(err));
@@ -24,7 +26,7 @@ function App() {
     setError(null);
 
     try {
-      const res = await axios.post('http://localhost:5000/api', { city });
+      const res = await axios.post(`${BASE_URL}/api`, { city });
       setResult(res.data);
     } catch (err) {
       setError('Gagal mengambil data. Pastikan backend sudah jalan.');
@@ -42,7 +44,7 @@ function App() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/history/weather/${id}`);
+      await axios.delete(`${BASE_URL}/api/history/weather/${id}`);
       setHistory(history.filter((item) => item.id !== id));
     } catch (err) {
       console.error('Error deleting history:', err);
@@ -51,7 +53,7 @@ function App() {
 
   const handleDeleteAll = async () => {
     try {
-      await axios.delete('http://localhost:5000/api/history/weather');
+      await axios.delete(`${BASE_URL}/api/history/weather`);
       setHistory([]);
     } catch (err) {
       console.error('Error deleting all history:', err);
@@ -100,7 +102,7 @@ function App() {
               onClick={handleDeleteAll}
               className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105"
             >
-              
+              Hapus Semua Riwayat
             </button>
           </div>
         </div>
