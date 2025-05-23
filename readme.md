@@ -54,8 +54,18 @@ docker-compose up --build
 
 - DELETE /history → Menghapus seluruh riwayat
 
-# 📜 Lisensi
-Proyek ini dikembangkan oleh Kelompok 1 - Cloud Computing Class sebagai bagian dari tugas pengembangan aplikasi berbasis cloud modern.
+### 3. CI/CD Deployment
+Proyek ini menggunakan Railway untuk proses CI/CD otomatis. Setiap kali ada push ke branch main di repository GitHub, Railway akan otomatis melakukan hal berikut:
+- Menarik perubahan terbaru dari repository.
+- Membangun ulang environment backend dan frontend.
+- Deploy aplikasi ke cloud.
+
+Setiap perubahan di GitHub (baik frontend atau backend) akan otomatis dideploy ke platform cloud tanpa memerlukan tindakan manual.
+
+#### Environment Variables di Railway
+Terdapat beberapa environment variables yang digunakan oleh aplikasi, yang disetting melalui Railway:
+- API_KEY: Kunci API untuk mengakses OpenWeatherMap.
+- DATABASE_URL: URL untuk menghubungkan ke database PostgreSQL yang di-host di Railway.
 
 
 
